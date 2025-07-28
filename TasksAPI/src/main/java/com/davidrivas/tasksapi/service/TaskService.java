@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +28,34 @@ public class TaskService {
 
     public TaskResponse createTask(TaskRequest task){
         List<Task> tasks = taskRepository.findAll();
-        for (int i = 0; i < tasks.size(); i++) {
-            if(task.getTaskTitle().equals(tasks.get(i).getTaskTitle())){
+        for (Task value : tasks) {
+            if (task.getTaskTitle().equals(value.getTaskTitle())) {
                 return null;
             }
         }
 
         Task newTask = taskMapper.toEntity(task);
         return taskMapper.toResponse(taskRepository.save(newTask));
+    }
+
+    public TaskResponse updateTask(Integer id, TaskRequest task){
+        Optional<Task> taskToUpdate = taskRepository.findById(id);
+        if(taskToUpdate.isEmpty()){
+            return null;
+        }
+
+        taskToUpdate.get().setTaskTitle(task.getTaskTitle());
+        taskToUpdate.get().setDescription(task.getDescription());
+        taskToUpdate.get().setDeadline(task.getDeadline());
+
+        return taskMapper.toResponse(taskToUpdate.get());
+    }
+
+    public TaskResponse deleteTask(Integer id){
+        Optional<Task> taskToDelete = taskRepository.findById(id);
+        if(taskToDelete.isEmpty()) return null;
+
+        taskRepository.delete(taskToDelete.get());
+        return taskMapper.toResponse(taskToDelete.get());
     }
 }

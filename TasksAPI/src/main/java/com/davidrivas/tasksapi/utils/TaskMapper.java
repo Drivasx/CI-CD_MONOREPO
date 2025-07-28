@@ -12,4 +12,5 @@ public interface TaskMapper {
 
     @Mapping(target = "createdAt", source = "createdAt")
     TaskResponse toResponse(Task task);
+
 }

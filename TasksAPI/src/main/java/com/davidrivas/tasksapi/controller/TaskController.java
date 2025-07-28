@@ -32,4 +32,19 @@ public class TaskController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequest));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Integer id, @RequestBody TaskRequest updatedTask){
+        if(taskService.updateTask(id, updatedTask) == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        return ResponseEntity.ok(taskService.updateTask(id, updatedTask));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TaskResponse> deleteTask(@PathVariable Integer id){
+        if(taskService.deleteTask(id) == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return ResponseEntity.ok(taskService.deleteTask(id));
+    }
 }
