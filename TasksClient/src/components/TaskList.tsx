@@ -1,49 +1,38 @@
-import { useEffect, useState } from "react"
 import { Task } from "./Task"
-
-interface TaskType {
-  id: number;
-  taskTitle: string;
-  description?: string;
-  deadline: string;
-  completed: boolean;
-}
+import { useTaskContext } from "../context/TaskContext"
 
 export const TaskList = () => {
-  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const { tasks, toggleTask, loading } = useTaskContext()
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/v1/tasks')
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = await response.json()
-        setTasks(data)
-        console.log(data)
-      } catch (error) {
-        console.error('Failed to fetch tasks:', error)
-      }
-    }
-    fetchTasks()
-  }, [])
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-4">
+        <div className="text-lg">Cargando tareas...</div>
+      </div>
+    )
+  }
+
+  if (tasks.length === 0) {
+    return (
+      <div className="text-center text-gray-500 p-4">
+        No hay tareas disponibles. ¡Agrega tu primera tarea!
+      </div>
+    )
+  }
+
   return (
     <div>
         {tasks.map((task) => {
             return (
                 <Task 
-                    key={task.id as number} 
+                    key={task.id} 
                     props={{
                         id: task.id,
                         taskTitle: task.taskTitle,
                         description: task.description,
                         deadline: new Date(task.deadline).toISOString(),
                         completed: task.completed,
-                        onToggle: (id) => {
-                            // Handle toggle logic here
-                            console.log(`Toggled task with id: ${id}`)
-                        }
+                        onToggle: toggleTask
                     }} 
                 />
             )
